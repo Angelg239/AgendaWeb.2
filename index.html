@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgendaWeb - Serene Focus</title>
+  
+  <!-- Tipografias de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Hoja de Estilos -->
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Seccion Izquierda: Formulario -->
+    <section class="form-container">
+      <div class="form-card">
+        
+        <div class="form-header">
+          <h2>Registrar Evento</h2>
+          <p>Ingresa los detalles para guardar en tu agenda</p>
+        </div>
+
+        <form id="form-evento">
+          
+          <!-- Titulo -->
+          <div class="form-group">
+            <label for="titulo">Titulo del evento</label>
+            <input type="text" id="titulo" placeholder="Ej. Reunion de proyecto" required>
+          </div>
+
+          <!-- Categoria -->
+          <div class="form-group">
+            <label for="categoria">Categoria</label>
+            <select id="categoria">
+              <option value="Trabajo">Trabajo</option>
+              <option value="Personal">Personal</option>
+              <option value="Estudio">Estudio</option>
+              <option value="Salud">Salud</option>
+            </select>
+          </div>
+
+          <!-- Fecha e Hora -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fecha">Fecha</label>
+              <input type="date" id="fecha" required>
+            </div>
+
+            <div class="form-group">
+              <label for="hora-inicio">Hora inicio</label>
+              <input type="time" id="hora-inicio" required>
+            </div>
+          </div>
+
+          <!-- Lugar / Enlace -->
+          <div class="form-group">
+            <label for="ubicacion">Ubicacion o enlace</label>
+            <input type="text" id="ubicacion" placeholder="Ej. Google Meet o Sala 3">
+          </div>
+
+          <!-- Notas -->
+          <div class="form-group">
+            <label for="notas">Notas adicionales</label>
+            <textarea id="notas" placeholder="Detalles relevantes sobre el evento..."></textarea>
+          </div>
+
+          <!-- Botones de accion -->
+          <div class="form-actions">
+            <button type="reset" class="btn-secondary">Limpiar</button>
+            <button type="submit" class="btn-primary">Guardar Evento</button>
+          </div>
+
+        </form>
+
+      </div>
+    </section>
+
+    <!-- Seccion Derecha: Vista de Eventos -->
+    <section class="events-container">
+      
+      <header class="main-header">
+        <h1>Mi Agenda</h1>
+        <p class="subtitle">Organizacion serena de tus actividades</p>
+      </header>
+
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <button class="filter-chip active" data-filter="Todos">Todos</button>
+        <button class="filter-chip" data-filter="Trabajo">Trabajo</button>
+        <button class="filter-chip" data-filter="Estudio">Estudio</button>
+        <button class="filter-chip" data-filter="Personal">Personal</button>
+        <button class="filter-chip" data-filter="Salud">Salud</button>
+      </div>
+
+      <!-- Lista de eventos agregados -->
+      <div id="event-list" class="event-list">
+        <!-- Los eventos se cargaran dinamicamente con JavaScript -->
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Javascript funcional Integrado -->
+  <script>
+    let eventos = [
+      { id: 1, titulo: "Reunion de Diseno UI", categoria: "Trabajo", fecha: "2026-09-23", hora: "10:00", ubicacion: "Google Meet", notas: "Revisar paleta de colores", completado: false },
+      { id: 2, titulo: "Cita Medica", categoria: "Salud", fecha: "2026-09-23", hora: "16:00", ubicacion: "Clinica Central", notas: "Llevar historial", completado: false }
+    ];
+
+    let filtroActual = "Todos";
+
+    const form = document.getElementById("form-evento");
+    const containerEventos = document.getElementById("event-list");
+    const filterButtons = document.querySelectorAll(".filter-chip");
+
+    function renderEventos() {
+      containerEventos.innerHTML = "";
+      
+      const filtrados = eventos.filter(evt => filtroActual === "Todos" || evt.categoria === filtroActual);
+
+      if (filtrados.length === 0) {
+        containerEventos.innerHTML = `<div class="empty-state">No hay eventos para mostrar.</div>`;
+        return;
+      }
+
+      filtrados.forEach(evt => {
+        const card = document.createElement("article");
+        card.className = `event-card ${evt.completado ? 'completed' : ''}`;
+        card.innerHTML = `
+          <div class="event-info">
+            <h3>${evt.titulo}</h3>
+            <div class="event-meta">
+              <span>Horario: ${evt.fecha} a las ${evt.hora}</span>
+              ${evt.ubicacion ? `<span>Lugar: ${evt.ubicacion}</span>` : ''}
+            </div>
+            ${evt.notas ? `<p class="event-notes">${evt.notas}</p>` : ''}
+          </div>
+          <div class="event-actions">
+            <span class="badge">${evt.categoria}</span>
+            <button class="btn-check" onclick="toggleCompletado(${evt.id})">${evt.completado ? 'Desmarcar' : 'Completar'}</button>
+            <button class="btn-delete" onclick="eliminarEvento(${evt.id})">Eliminar</button>
+          </div>
+        `;
+        containerEventos.appendChild(card);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nuevoEvento = {
+        id: Date.now(),
+        titulo: document.getElementById("titulo").value,
+        categoria: document.getElementById("categoria").value,
+        fecha: document.getElementById("fecha").value,
+        hora: document.getElementById("hora-inicio").value,
+        ubicacion: document.getElementById("ubicacion").value,
+        notas: document.getElementById("notas").value,
+        completado: false
+      };
+
+      eventos.unshift(nuevoEvento);
+      form.reset();
+      renderEventos();
+    });
+
+    function toggleCompletado(id) {
+      eventos = eventos.map(e => e.id === id ? { ...e, completado: !e.completado } : e);
+      renderEventos();
+    }
+
+    function eliminarEvento(id) {
+      eventos = eventos.filter(e => e.id !== id);
+      renderEventos();
+    }
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        filtroActual = btn.getAttribute("data-filter");
+        renderEventos();
+      });
+    });
+
+    renderEventos();
+  </script>
+</body>
+</html>
