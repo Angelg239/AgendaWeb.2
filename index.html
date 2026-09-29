@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgendaWeb - Serene Focus</title>
   
-  <!-- Tipografias de Google Fonts -->
+  <!-- Tipografías de Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,35 @@
 
   <div class="app-layout">
     
-    <!-- Seccion Izquierda: Formulario -->
-    <section class="form-container">
+    <!-- VISTA 1: Lista de Eventos y Botón Nuevo Evento -->
+    <section id="vista-principal" class="view-section active">
+      
+      <header class="main-header-flex">
+        <div>
+          <h1>Mi Agenda</h1>
+          <p class="subtitle">Organización serena de tus actividades</p>
+        </div>
+        <button id="btn-ir-nuevo" class="btn-primary">＋ Nuevo evento</button>
+      </header>
+
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <button class="filter-chip active" data-filter="Todos">Todos</button>
+        <button class="filter-chip" data-filter="Trabajo">Trabajo</button>
+        <button class="filter-chip" data-filter="Estudio">Estudio</button>
+        <button class="filter-chip" data-filter="Personal">Personal</button>
+        <button class="filter-chip" data-filter="Salud">Salud</button>
+      </div>
+
+      <!-- Lista de eventos agregados -->
+      <div id="event-list" class="event-list">
+        <!-- Los eventos se cargarán dinámicamente con JavaScript -->
+      </div>
+
+    </section>
+
+    <!-- VISTA 2: Formulario de Registro de Eventos -->
+    <section id="vista-formulario" class="view-section hidden">
       <div class="form-card">
         
         <div class="form-header">
@@ -28,15 +55,15 @@
 
         <form id="form-evento">
           
-          <!-- Titulo -->
+          <!-- Título -->
           <div class="form-group">
-            <label for="titulo">Titulo del evento</label>
-            <input type="text" id="titulo" placeholder="Ej. Reunion de proyecto" required>
+            <label for="titulo">Título del evento</label>
+            <input type="text" id="titulo" placeholder="Ej. Reunión de proyecto" required>
           </div>
 
-          <!-- Categoria -->
+          <!-- Categoría -->
           <div class="form-group">
-            <label for="categoria">Categoria</label>
+            <label for="categoria">Categoría</label>
             <select id="categoria">
               <option value="Trabajo">Trabajo</option>
               <option value="Personal">Personal</option>
@@ -60,7 +87,7 @@
 
           <!-- Lugar / Enlace -->
           <div class="form-group">
-            <label for="ubicacion">Ubicacion o enlace</label>
+            <label for="ubicacion">Ubicación o enlace</label>
             <input type="text" id="ubicacion" placeholder="Ej. Google Meet o Sala 3">
           </div>
 
@@ -70,9 +97,9 @@
             <textarea id="notas" placeholder="Detalles relevantes sobre el evento..."></textarea>
           </div>
 
-          <!-- Botones de accion -->
+          <!-- Botones de acción -->
           <div class="form-actions">
-            <button type="reset" class="btn-secondary">Limpiar</button>
+            <button type="button" id="btn-cancelar" class="btn-secondary">Cancelar</button>
             <button type="submit" class="btn-primary">Guardar Evento</button>
           </div>
 
@@ -81,44 +108,40 @@
       </div>
     </section>
 
-    <!-- Seccion Derecha: Vista de Eventos -->
-    <section class="events-container">
-      
-      <header class="main-header">
-        <h1>Mi Agenda</h1>
-        <p class="subtitle">Organizacion serena de tus actividades</p>
-      </header>
-
-      <!-- Filtros -->
-      <div class="filter-bar">
-        <button class="filter-chip active" data-filter="Todos">Todos</button>
-        <button class="filter-chip" data-filter="Trabajo">Trabajo</button>
-        <button class="filter-chip" data-filter="Estudio">Estudio</button>
-        <button class="filter-chip" data-filter="Personal">Personal</button>
-        <button class="filter-chip" data-filter="Salud">Salud</button>
-      </div>
-
-      <!-- Lista de eventos agregados -->
-      <div id="event-list" class="event-list">
-        <!-- Los eventos se cargaran dinamicamente con JavaScript -->
-      </div>
-
-    </section>
-
   </div>
 
   <!-- Javascript funcional Integrado -->
   <script>
     let eventos = [
-      { id: 1, titulo: "Reunion de Diseno UI", categoria: "Trabajo", fecha: "2026-09-23", hora: "10:00", ubicacion: "Google Meet", notas: "Revisar paleta de colores", completado: false },
-      { id: 2, titulo: "Cita Medica", categoria: "Salud", fecha: "2026-09-23", hora: "16:00", ubicacion: "Clinica Central", notas: "Llevar historial", completado: false }
+      { id: 1, titulo: "Reunión de Diseño UI", categoria: "Trabajo", fecha: "2026-09-23", hora: "10:00", ubicacion: "Google Meet", notas: "Revisar paleta de colores", completado: false },
+      { id: 2, titulo: "Cita Médica", categoria: "Salud", fecha: "2026-09-23", hora: "16:00", ubicacion: "Clínica Central", notas: "Llevar historial", completado: false }
     ];
 
     let filtroActual = "Todos";
 
+    const vistaPrincipal = document.getElementById("vista-principal");
+    const vistaFormulario = document.getElementById("vista-formulario");
+    const btnIrNuevo = document.getElementById("btn-ir-nuevo");
+    const btnCancelar = document.getElementById("btn-cancelar");
     const form = document.getElementById("form-evento");
     const containerEventos = document.getElementById("event-list");
     const filterButtons = document.querySelectorAll(".filter-chip");
+
+    // Navegación entre vistas
+    btnIrNuevo.addEventListener("click", () => {
+      vistaPrincipal.classList.remove("active");
+      vistaPrincipal.classList.add("hidden");
+      vistaFormulario.classList.remove("hidden");
+      vistaFormulario.classList.add("active");
+    });
+
+    btnCancelar.addEventListener("click", () => {
+      vistaFormulario.classList.remove("active");
+      vistaFormulario.classList.add("hidden");
+      vistaPrincipal.classList.remove("hidden");
+      vistaPrincipal.classList.add("active");
+      form.reset();
+    });
 
     function renderEventos() {
       containerEventos.innerHTML = "";
@@ -168,6 +191,12 @@
       eventos.unshift(nuevoEvento);
       form.reset();
       renderEventos();
+
+      // Regresar a la vista principal al guardar
+      vistaFormulario.classList.remove("active");
+      vistaFormulario.classList.add("hidden");
+      vistaPrincipal.classList.remove("hidden");
+      vistaPrincipal.classList.add("active");
     });
 
     function toggleCompletado(id) {
